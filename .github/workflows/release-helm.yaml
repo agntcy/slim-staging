@@ -1,0 +1,87 @@
+# Copyright AGNTCY Contributors (https://github.com/agntcy)
+# SPDX-License-Identifier: Apache-2.0
+
+---
+name: Release Helm chart
+
+on:
+  push:
+    tags:
+      - 'helm-*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Release Helm chart
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Helm
+        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
+        with:
+          version: "3.12.1"
+
+      # Tags look like helm-<chart>-v<version>, e.g. helm-slim-v2.2.0.
+      - name: Resolve chart name and version
+        id: chart
+        env:
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+        run: |
+          chart_tag="${GITHUB_REF_NAME#helm-}"
+          name="${chart_tag%-v*}"
+          version="v${chart_tag##*-v}"
+          if [ ! -d "charts/$name" ]; then
+            echo "no chart at charts/$name for tag $GITHUB_REF_NAME" >&2
+            exit 1
+          fi
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Helm lint
+        env:
+          CHART: ${{ steps.chart.outputs.name }}
+        run: |
+          # slim-spire vendors spire-lib into each subchart, so the subcharts
+          # cannot be linted on their own -- the library only resolves via the
+          # parent.
+          args=()
+          if [ "$CHART" != "slim-spire" ]; then
+            args+=("--with-subcharts")
+          fi
+          helm lint "charts/$CHART" "${args[@]}"
+
+      - name: Helm package
+        id: package
+        env:
+          CHART: ${{ steps.chart.outputs.name }}
+          VERSION: ${{ steps.chart.outputs.version }}
+        run: |
+          helm package "charts/$CHART" --dependency-update --version "$VERSION"
+          echo "file=${CHART}-${VERSION}.tgz" >> "$GITHUB_OUTPUT"
+
+      - name: Push to GHCR
+        env:
+          FILE: ${{ steps.package.outputs.file }}
+        run: |
+          helm push "$FILE" "oci://ghcr.io/${GITHUB_REPOSITORY_OWNER}/slim-staging/helm-charts"

@@ -1,0 +1,65 @@
+# Copyright AGNTCY Contributors (https://github.com/agntcy)
+# SPDX-License-Identifier: Apache-2.0
+
+---
+name: Helm lint
+
+on:
+  pull_request:
+    paths:
+      - 'charts/**'
+      - '.github/workflows/helm-lint.yaml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'charts/**'
+      - '.github/workflows/helm-lint.yaml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  lint:
+    name: Lint charts
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        chart:
+          - slim
+          - slim-control-plane
+          - slim-channel-manager
+          - slim-spire
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+
+      - name: Setup Helm
+        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
+        with:
+          version: "3.12.1"
+
+      - name: Helm lint
+        env:
+          CHART: ${{ matrix.chart }}
+        run: |
+          # slim-spire vendors spire-lib into each subchart, so the subcharts
+          # cannot be linted on their own -- the library only resolves via the
+          # parent.
+          args=()
+          if [ "$CHART" != "slim-spire" ]; then
+            args+=("--with-subcharts")
+          fi
+          helm lint "charts/$CHART" "${args[@]}"
+
+      - name: Helm template
+        env:
+          CHART: ${{ matrix.chart }}
+        run: helm template release "charts/$CHART" >/dev/null
