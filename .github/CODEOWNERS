@@ -3,4 +3,8 @@
 # the repository. Unless a later match takes precedence,
 # the following users/teams will be requested for
 # review when someone opens a pull request.
-* @agntcy/slim-ops
+#
+# Both teams are listed because the ruleset requires a code-owner
+# approval and has no bypass actors: with slim-ops alone (two people) a
+# PR authored by one of them can only ever be approved by the other.
+* @agntcy/slim-ops @agntcy/slim-maintainers
