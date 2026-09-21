@@ -133,6 +133,15 @@ jobs:
             echo "no chart at charts/$name" >&2
             exit 1
           fi
+          # The published artifact takes its version from the tag, so a tag
+          # that disagrees with Chart.yaml ships content under a version that
+          # does not describe it. That is how slim-spire came to publish SPIRE
+          # 1.15.3 as v2.0.0.
+          declared=$(awk '/^version:/ {print $2; exit}' "charts/$name/Chart.yaml" | tr -d '"')
+          if [ "${version#v}" != "$declared" ]; then
+            echo "version mismatch: releasing ${version#v} but charts/$name/Chart.yaml says $declared" >&2
+            exit 1
+          fi
           echo "name=$name" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
