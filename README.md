@@ -6,6 +6,9 @@ This repo holds deployment configuration only. It does not build or publish
 anything: the Helm charts are published from the `slim` repo as OCI artifacts
 and consumed here by coordinate.
 
+To point a cluster at this deployment, or to run your own copy of it, see
+[docs/deploying.md](docs/deploying.md).
+
 ## Layout
 
 | Path | Contents |
