@@ -61,6 +61,10 @@ jobs:
           client-id: ${{ secrets.PROJECT_APP_ID }}
           private-key: ${{ secrets.PROJECT_APP_KEY }}
           owner: ${{ github.repository_owner }}
+          # Scoped to slim, not the whole org. GHCR resolves a package's
+          # permissions through the repository that owns it, and an org-wide
+          # token does not pin one, which is what the 403 looked like.
+          repositories: slim
 
       # What the app can actually reach. A 403 on push is an authorization
       # failure, not an authentication one, so the useful question is whether
@@ -131,6 +135,23 @@ jobs:
           fi
           echo "name=$name" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      # What GHCR will actually grant this token for the target package. The
+      # access in the reply is what a push would get, so a missing "push"
+      # names the gap without publishing anything.
+      - name: Report GHCR granted scope
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          CHART: ${{ steps.chart.outputs.name }}
+        run: |
+          pkg="${GITHUB_REPOSITORY_OWNER}/slim/helm/${CHART}"
+          {
+            echo "### GHCR granted scope for ${pkg}"
+            echo '```'
+            curl -sS -u "x:${GH_TOKEN}" "https://ghcr.io/token?service=ghcr.io&scope=repository:${pkg}:pull,push" \
+              | jq -r '(.token // "") as $t | if $t == "" then "  no token in reply" else ($t | split(".")[1] | gsub("-";"+") | gsub("_";"/") | @base64d | fromjson | (.access // [])) | (if length == 0 then "  none granted -- may pull but not push" else (.[] | "  \(.type) \(.name): \(.actions | join(","))") end) end' || true
+            echo '```'
+          } | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Helm lint
         env:
