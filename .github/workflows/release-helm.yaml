@@ -8,6 +8,27 @@ on:
   push:
     tags:
       - 'helm-*'
+  # Lets the publish path be exercised without burning a tag. dry_run stops
+  # before the push, so it is safe to run against an already-released version.
+  workflow_dispatch:
+    inputs:
+      chart:
+        description: Chart directory under charts/
+        required: true
+        type: choice
+        options:
+          - slim
+          - slim-control-plane
+          - slim-channel-manager
+          - slim-spire
+      version:
+        description: Version to publish, e.g. v2.0.1
+        required: true
+        type: string
+      dry_run:
+        description: Authenticate and package, but do not push
+        default: true
+        type: boolean
 
 permissions:
   contents: read
@@ -41,6 +62,21 @@ jobs:
           private-key: ${{ secrets.PROJECT_APP_KEY }}
           owner: ${{ github.repository_owner }}
 
+      # What the app can actually reach. A 403 on push is an authorization
+      # failure, not an authentication one, so the useful question is whether
+      # the installation covers the repo that owns the package.
+      - name: Report app installation access
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          echo "### App installation access" >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "repositories:"
+            gh api /installation/repositories --jq '.repositories[].full_name' 2>&1 | sed 's/^/  /' || true
+            echo "permissions:"
+            gh api /installation/repositories --jq '.repositories[0].permissions' 2>&1 | sed 's/^/  /' || true
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
@@ -53,17 +89,26 @@ jobs:
         with:
           version: "3.12.1"
 
-      # Tags look like helm-<chart>-v<version>, e.g. helm-slim-v2.2.0.
+      # Tags look like helm-<chart>-v<version>, e.g. helm-slim-v2.2.0. On a
+      # manual run the chart and version come from the inputs instead.
       - name: Resolve chart name and version
         id: chart
         env:
+          EVENT: ${{ github.event_name }}
           GITHUB_REF_NAME: ${{ github.ref_name }}
+          INPUT_CHART: ${{ inputs.chart }}
+          INPUT_VERSION: ${{ inputs.version }}
         run: |
-          chart_tag="${GITHUB_REF_NAME#helm-}"
-          name="${chart_tag%-v*}"
-          version="v${chart_tag##*-v}"
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            name="$INPUT_CHART"
+            version="$INPUT_VERSION"
+          else
+            chart_tag="${GITHUB_REF_NAME#helm-}"
+            name="${chart_tag%-v*}"
+            version="v${chart_tag##*-v}"
+          fi
           if [ ! -d "charts/$name" ]; then
-            echo "no chart at charts/$name for tag $GITHUB_REF_NAME" >&2
+            echo "no chart at charts/$name" >&2
             exit 1
           fi
           echo "name=$name" >> "$GITHUB_OUTPUT"
@@ -95,7 +140,14 @@ jobs:
       # is what every install doc already points at, and "staging" in a
       # production install path would be misleading.
       - name: Push to GHCR
+        if: ${{ github.event_name != 'workflow_dispatch' || !inputs.dry_run }}
         env:
           FILE: ${{ steps.package.outputs.file }}
         run: |
           helm push "$FILE" "oci://ghcr.io/${GITHUB_REPOSITORY_OWNER}/slim/helm"
+
+      - name: Dry run, not pushed
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+        env:
+          FILE: ${{ steps.package.outputs.file }}
+        run: echo "packaged $FILE; skipped push (dry_run)" >> "$GITHUB_STEP_SUMMARY"
