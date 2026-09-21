@@ -4,11 +4,11 @@
 version: '3'
 
 vars:
+  # Only spire. The slim images this repo's charts reference are built in
+  # agntcy/slim and scanned there; duplicating them would report the same
+  # CVEs against two repositories.
   VULN_SCAN_CHARTS:
     - applications/slim-spire/dev
-    - applications/slim-control-plane/dev
-    - applications/slim/dev
-    - applications/slim-channel-manager/dev
 
 tasks:
   default:

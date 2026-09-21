@@ -1,5 +1,5 @@
 {
   "chart_repo": "ghcr.io",
   "chart_name": "agntcy/slim/helm/slim-spire",
-  "chart_version": "v2.0.0"
+  "chart_version": "v2.0.1"
 }
