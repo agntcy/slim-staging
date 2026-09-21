@@ -103,7 +103,10 @@ jobs:
         uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
+          # App installation tokens are presented as x-access-token. Using a
+          # human login here is what an anonymous-looking GHCR token reply
+          # pointed at.
+          username: x-access-token
           password: ${{ steps.app-token.outputs.token }}
 
       - name: Setup Helm
@@ -149,7 +152,7 @@ jobs:
             echo "### GHCR granted scope for ${pkg}"
             echo '```'
             curl -sS -u "x:${GH_TOKEN}" "https://ghcr.io/token?service=ghcr.io&scope=repository:${pkg}:pull,push" \
-              | jq -r '(.token // "") as $t | if $t == "" then "  no token in reply" else ($t | split(".")[1] | gsub("-";"+") | gsub("_";"/") | @base64d | fromjson | (.access // [])) | (if length == 0 then "  none granted -- may pull but not push" else (.[] | "  \(.type) \(.name): \(.actions | join(","))") end) end' || true
+              | jq -r '(.token // "") as $t | ($t | split(".")) as $parts | if ($parts | length) < 3 then "  reply carries no JWT -- credentials not recognised, treated as anonymous" else ($parts[1] | gsub("-";"+") | gsub("_";"/") | @base64d | fromjson | (.access // [])) | (if length == 0 then "  none granted -- may pull but not push" else (.[] | "  \(.type) \(.name): \(.actions | join(","))") end) end' || true
             echo '```'
           } | tee -a "$GITHUB_STEP_SUMMARY"
 
