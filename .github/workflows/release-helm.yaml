@@ -51,60 +51,15 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-      # The charts publish under ghcr.io/agntcy/slim/helm, whose packages are
-      # owned by the slim repo. The default GITHUB_TOKEN is scoped to this
-      # repo and cannot write them, so authenticate as the automation app.
-      - name: Authenticate with GitHub App Bot
-        id: app-token
-        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
-        with:
-          client-id: ${{ secrets.PROJECT_APP_ID }}
-          private-key: ${{ secrets.PROJECT_APP_KEY }}
-          owner: ${{ github.repository_owner }}
-          # Scoped to slim, not the whole org. GHCR resolves a package's
-          # permissions through the repository that owns it, and an org-wide
-          # token does not pin one, which is what the 403 looked like.
-          repositories: slim
-
-      # What the app can actually reach. A 403 on push is an authorization
-      # failure, not an authentication one, so the useful question is whether
-      # the installation covers the repo that owns the package.
-      - name: Report app access and permissions
-        env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
-          CLIENT_ID: ${{ secrets.PROJECT_APP_ID }}
-          PRIVATE_KEY: ${{ secrets.PROJECT_APP_KEY }}
-        run: |
-          {
-            echo "### App installation access"
-            echo '```'
-            echo "repositories the installation covers:"
-            gh api /installation/repositories --jq '.repositories[].full_name' 2>&1 | sed 's/^/  /' || true
-
-            # The app's granted permissions are only visible via GET /app,
-            # which needs a JWT signed with the private key rather than the
-            # installation token.
-            b64() { base64 | tr -d '\n=' | tr '+/' '-_'; }
-            now=$(date +%s)
-            hdr=$(printf '{"alg":"RS256","typ":"JWT"}' | b64)
-            pld=$(printf '{"iat":%d,"exp":%d,"iss":"%s"}' "$((now - 60))" "$((now + 540))" "$CLIENT_ID" | b64)
-            key=$(mktemp); printf '%s' "$PRIVATE_KEY" > "$key"
-            sig=$(printf '%s.%s' "$hdr" "$pld" | openssl dgst -sha256 -sign "$key" -binary | b64)
-            rm -f "$key"
-            echo "app permissions:"
-            curl -sS -H "Authorization: Bearer ${hdr}.${pld}.${sig}" \
-              -H "Accept: application/vnd.github+json" \
-              https://api.github.com/app \
-              | jq -r 'if .permissions then (.permissions | to_entries[] | "  \(.key): \(.value)") else "  \(.message // .)" end' || true
-            echo '```'
-          } | tee -a "$GITHUB_STEP_SUMMARY"
-
+      # The charts publish under ghcr.io/agntcy/slim/helm, so those packages
+      # must grant this repository Write under their Actions access. Every
+      # other GHCR push in the org authenticates this way.
       - name: Login to GitHub Container Registry
         uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ steps.app-token.outputs.token }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Helm
         uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
@@ -133,25 +88,17 @@ jobs:
             echo "no chart at charts/$name" >&2
             exit 1
           fi
+          # The published artifact takes its version from the tag, so a tag
+          # that disagrees with Chart.yaml ships content under a version that
+          # does not describe it. That is how slim-spire came to publish SPIRE
+          # 1.15.3 as v2.0.0.
+          declared=$(awk '/^version:/ {print $2; exit}' "charts/$name/Chart.yaml" | tr -d '"')
+          if [ "${version#v}" != "$declared" ]; then
+            echo "version mismatch: releasing ${version#v} but charts/$name/Chart.yaml says $declared" >&2
+            exit 1
+          fi
           echo "name=$name" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
-
-      # What GHCR will actually grant this token for the target package. The
-      # access in the reply is what a push would get, so a missing "push"
-      # names the gap without publishing anything.
-      - name: Report GHCR granted scope
-        env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
-          CHART: ${{ steps.chart.outputs.name }}
-        run: |
-          pkg="${GITHUB_REPOSITORY_OWNER}/slim/helm/${CHART}"
-          {
-            echo "### GHCR granted scope for ${pkg}"
-            echo '```'
-            curl -sS -u "x:${GH_TOKEN}" "https://ghcr.io/token?service=ghcr.io&scope=repository:${pkg}:pull,push" \
-              | jq -r '(.token // "") as $t | if $t == "" then "  no token in reply" else ($t | split(".")[1] | gsub("-";"+") | gsub("_";"/") | @base64d | fromjson | (.access // [])) | (if length == 0 then "  none granted -- may pull but not push" else (.[] | "  \(.type) \(.name): \(.actions | join(","))") end) end' || true
-            echo '```'
-          } | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Helm lint
         env:
