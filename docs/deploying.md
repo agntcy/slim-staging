@@ -11,9 +11,9 @@ different cluster.
 - Enough privilege for ArgoCD to create namespaces and cluster-scoped
   resources — SPIRE installs CRDs and a CSI driver
 
-Nothing needs to be built. The Helm charts are published from the
-[slim](https://github.com/agntcy/slim) repo and pulled from
-`ghcr.io/agntcy/slim/helm/<chart>`.
+Nothing needs to be built. The charts live in `charts/` in this repo and are
+pulled from `ghcr.io/agntcy/slim-staging/helm-charts/<chart>`, published by
+the release workflow on a `helm-<chart>-v<version>` tag.
 
 ## Bootstrap
 
@@ -81,6 +81,12 @@ Fork the repo, then repoint five references at your fork:
 
 Miss the `sourceRepos` entry and ArgoCD refuses the Application with a project
 permission error, which reads as a permissions problem rather than a stale URL.
+
+A fork gets the charts too, since they live in `charts/`. Keep pulling the
+published `ghcr.io/agntcy/slim-staging/helm-charts/<chart>` and only the five
+references above change. To publish your own instead, point `chart_name` in
+each `applications/<app>/<env>/config.json` at your registry and push
+`helm-<chart>-v<version>` tags on the fork.
 
 For a different environment, copy the `dev` directories to a new name and
 update the `list` generator elements plus the `files` paths in the

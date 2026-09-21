@@ -1,5 +1,5 @@
 {
   "chart_repo": "ghcr.io",
-  "chart_name": "agntcy/slim/helm/slim-control-plane",
+  "chart_name": "agntcy/slim-staging/helm-charts/slim-control-plane",
   "chart_version": "v2.2.0"
 }
