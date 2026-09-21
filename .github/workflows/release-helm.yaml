@@ -65,16 +65,34 @@ jobs:
       # What the app can actually reach. A 403 on push is an authorization
       # failure, not an authentication one, so the useful question is whether
       # the installation covers the repo that owns the package.
-      - name: Report app installation access
+      - name: Report app access and permissions
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          CLIENT_ID: ${{ secrets.PROJECT_APP_ID }}
+          PRIVATE_KEY: ${{ secrets.PROJECT_APP_KEY }}
         run: |
-          echo "### App installation access" >> "$GITHUB_STEP_SUMMARY"
           {
-            echo "repositories:"
+            echo "### App installation access"
+            echo '```'
+            echo "repositories the installation covers:"
             gh api /installation/repositories --jq '.repositories[].full_name' 2>&1 | sed 's/^/  /' || true
-            echo "permissions:"
-            gh api /installation/repositories --jq '.repositories[0].permissions' 2>&1 | sed 's/^/  /' || true
+
+            # The app's granted permissions are only visible via GET /app,
+            # which needs a JWT signed with the private key rather than the
+            # installation token.
+            b64() { base64 | tr -d '\n=' | tr '+/' '-_'; }
+            now=$(date +%s)
+            hdr=$(printf '{"alg":"RS256","typ":"JWT"}' | b64)
+            pld=$(printf '{"iat":%d,"exp":%d,"iss":"%s"}' "$((now - 60))" "$((now + 540))" "$CLIENT_ID" | b64)
+            key=$(mktemp); printf '%s' "$PRIVATE_KEY" > "$key"
+            sig=$(printf '%s.%s' "$hdr" "$pld" | openssl dgst -sha256 -sign "$key" -binary | b64)
+            rm -f "$key"
+            echo "app permissions:"
+            curl -sS -H "Authorization: Bearer ${hdr}.${pld}.${sig}" \
+              -H "Accept: application/vnd.github+json" \
+              https://api.github.com/app \
+              | jq -r 'if .permissions then (.permissions | to_entries[] | "  \(.key): \(.value)") else "  \(.message // .)" end' || true
+            echo '```'
           } | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Login to GitHub Container Registry
