@@ -4,7 +4,7 @@ GitOps deployment for [SLIM](https://github.com/agntcy/slim), synced by ArgoCD.
 
 This repo holds the SLIM Helm charts and the ArgoCD configuration that deploys
 them. Charts are published as OCI artifacts to
-`ghcr.io/agntcy/slim-staging/helm-charts/<chart>` and consumed here by
+`ghcr.io/agntcy/slim/helm/<chart>` and consumed here by
 coordinate, so they can also be installed directly with `helm`.
 
 To point a cluster at this deployment, or to run your own copy of it, see
@@ -36,7 +36,7 @@ Applications sync in waves, because the stack has a startup order:
 ## Releasing a chart
 
 Push a `helm-<chart>-v<version>` tag, e.g. `helm-slim-v2.2.0`. CI lints,
-packages and pushes it to `ghcr.io/agntcy/slim-staging/helm-charts/<chart>`.
+packages and pushes it to `ghcr.io/agntcy/slim/helm/<chart>`.
 The version in the tag is what gets published, so keep it in step with the
 chart's `Chart.yaml`.
 

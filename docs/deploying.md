@@ -11,9 +11,9 @@ different cluster.
 - Enough privilege for ArgoCD to create namespaces and cluster-scoped
   resources — SPIRE installs CRDs and a CSI driver
 
-Nothing needs to be built. The Helm charts are published from the
-[slim](https://github.com/agntcy/slim) repo and pulled from
-`ghcr.io/agntcy/slim/helm/<chart>`.
+Nothing needs to be built. The charts live in `charts/` in this repo, are
+published by the release workflow on a `helm-<chart>-v<version>` tag, and are
+pulled from `ghcr.io/agntcy/slim/helm/<chart>`.
 
 ## Bootstrap
 
