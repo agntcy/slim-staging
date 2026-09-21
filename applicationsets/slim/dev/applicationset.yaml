@@ -1,0 +1,93 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: "slim-dev-appset"
+spec:
+  syncPolicy:
+    preserveResourcesOnDeletion: false
+  generators:
+    - merge:
+        mergeKeys:
+          - appName
+        generators:
+          # SPIRE issues the identities the rest of the stack authenticates
+          # with, so it lands first. slim-channel-manager dials the data plane
+          # at slim:46357, so it lands last.
+          - list:
+              elements:
+                - appName: slim-spire
+                  namespace: slim-dev-spire
+                  syncWave: "0"
+                - appName: slim-control-plane
+                  namespace: slim-dev-control-plane
+                  syncWave: "1"
+                - appName: slim
+                  namespace: slim-dev-slim
+                  syncWave: "2"
+                - appName: slim-channel-manager
+                  namespace: slim-dev-channel-manager
+                  syncWave: "3"
+          # Get cluster config to set the cluster address
+          - matrix:
+              generators:
+                - list:
+                    elements:
+                      - appName: slim-spire
+                      - appName: slim-control-plane
+                      - appName: slim
+                      - appName: slim-channel-manager
+                - git:
+                    repoURL: "https://github.com/agntcy/slim-staging"
+                    revision: main
+                    files:
+                      - path: "clusters/slim/dev/cluster-config.json"
+          # Get app config to set chart details
+          - matrix:
+              generators:
+                - list:
+                    elements:
+                      - appName: slim-spire
+                      - appName: slim-control-plane
+                      - appName: slim
+                      - appName: slim-channel-manager
+                - git:
+                    repoURL: "https://github.com/agntcy/slim-staging"
+                    revision: main
+                    files:
+                      - path: "applications/{{ appName }}/dev/config.json"
+  template:
+    metadata:
+      name: "{{ appName }}-slim-dev-argoapp"
+      labels:
+        app: "{{ appName }}"
+        env: "dev"
+      annotations:
+        argocd.argoproj.io/sync-wave: "{{ syncWave }}"
+    spec:
+      project: "slim-dev"
+      sources:
+        - repoURL: "{{ chart_repo }}"
+          chart: "{{ chart_name }}"
+          targetRevision: "{{ chart_version }}"
+          helm:
+            ignoreMissingValueFiles: true
+            valueFiles:
+              # Default values file
+              - "$values/applications/{{ appName }}/dev/values.yaml"
+              # Generated values file, usually created by scripts
+              - "$values/applications/{{ appName }}/dev/gen.values.yaml"
+        - repoURL: "https://github.com/agntcy/slim-staging"
+          targetRevision: main
+          ref: values
+      destination:
+        server: "{{ cluster_address }}"
+        namespace: "{{ namespace }}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: false
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true
+          - SkipDryRunOnMissingResource=true
+          - RespectIgnoreDifferences=true
