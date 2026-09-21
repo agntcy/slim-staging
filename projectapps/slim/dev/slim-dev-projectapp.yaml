@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: "slim-dev-projectapp"
+  namespace: argocd
+spec:
+  project: "slim-dev"
+  source:
+    path: "applicationsets/slim/dev"
+    repoURL: "https://github.com/agntcy/slim-staging"
+    targetRevision: main
+  destination:
+    namespace: argocd
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated: {}
