@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.0](https://github.com/agntcy/slim-staging/compare/helm-slim-channel-manager-v2.2.0...helm-slim-channel-manager-v2.3.0) (2026-10-06)
+
+
+### Features
+
+* **channel-manager:** add spire workload identity support ([#38](https://github.com/agntcy/slim-staging/issues/38)) ([aa5dedf](https://github.com/agntcy/slim-staging/commit/aa5dedf46d448f61eb22e94cabb342bbca38fbda))
+
 ## [2.2.0](https://github.com/agntcy/slim-staging/compare/helm-slim-channel-manager-v2.1.0...helm-slim-channel-manager-v2.2.0) (2026-10-06)
 
 
