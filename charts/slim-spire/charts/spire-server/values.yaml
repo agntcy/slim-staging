@@ -883,7 +883,7 @@ tools:
       registry: ""
       repository: busybox
       pullPolicy: IfNotPresent
-      tag: 1.37.0-uclibc
+      tag: 1.38.0-uclibc
 
 telemetry:
   prometheus:
@@ -1257,7 +1257,7 @@ chown:
     registry: ""
     repository: busybox
     pullPolicy: IfNotPresent
-    tag: 1.37.0-uclibc
+    tag: 1.38.0-uclibc
 
   ## @param chown.resources Specify resource needs as per https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
   resources: {}
