@@ -19,7 +19,6 @@
   "printConfig": false,
   "rebaseWhen": "behind-base-branch",
   "reviewersFromCodeOwners": true,
-  "schedule": ["before 8am on Monday"],
   "semanticCommits": "enabled",
   "timezone": "Etc/UTC",
   "packageRules": [
