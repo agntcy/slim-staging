@@ -1,0 +1,31 @@
+{{/*
+Copyright AGNTCY Contributors (https://github.com/agntcy)
+SPDX-License-Identifier: Apache-2.0
+*/}}
+
+{{ if eq .Values.spire.enabled true }}
+
+apiVersion: spire.spiffe.io/v1alpha1
+kind: ClusterSPIFFEID
+metadata:
+  name: {{ include "channel-manager.fullname" . }}
+spec:
+  className: {{ .Values.spire.className }}
+  podSelector:
+    matchExpressions:
+    - key: app.kubernetes.io/name
+      operator: In
+      values:
+      - {{ include "channel-manager.name" . }}
+  workloadSelectorTemplates:
+    - k8s:pod-image:{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
+    - k8s:sa:{{ include "channel-manager.serviceAccountName" . }}
+  spiffeIDTemplate: {{ "spiffe://{{ .TrustDomain }}/ns/{{ .PodMeta.Namespace }}/sa/{{ .PodSpec.ServiceAccountName }}" }}
+  {{- if .Values.spire.trustedDomains }}
+  federatesWith:
+  {{ range .Values.spire.trustedDomains }}
+    - {{ . }}
+  {{ end }}
+  {{- end }}
+
+{{ end }}
