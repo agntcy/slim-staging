@@ -15,6 +15,13 @@ data:
     {{- tpl (toYaml .Values.overrideConfig) . | nindent 4 }}
     {{- else }}
     {{- $config := deepCopy .Values.config }}
+    {{- /* The default auth block carries an empty shared-secret. Helm merges
+           maps, so it survives into a spire config and emits secret: "".
+           Drop it whenever the credential is not a shared secret. */}}
+    {{- $auth := (get $config "channel-manager").auth }}
+    {{- if and $auth (ne ($auth.type | toString) "shared_secret") }}
+    {{- $_ := unset $auth "secret" }}
+    {{- end }}
     {{- if .Values.persistence.enabled }}
     {{- $p := .Values.persistence }}
     {{- $persistenceCfg := dict "delete-sessions-on-shutdown" $p.deleteSessionsOnShutdown }}
