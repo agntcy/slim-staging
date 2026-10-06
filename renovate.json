@@ -20,7 +20,6 @@
   "labels": [
     "dependencies"
   ],
-  "minimumReleaseAge": "7 days",
   "osvVulnerabilityAlerts": true,
   "prConcurrentLimit": 10,
   "prHourlyLimit": 5,
