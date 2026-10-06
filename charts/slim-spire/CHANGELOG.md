@@ -1,6 +1,13 @@
 # Changelog
 
 
+## [2.0.2](https://github.com/agntcy/slim-staging/compare/helm-slim-spire-v2.0.1...helm-slim-spire-v2.0.2) (2026-10-06)
+
+
+### Bug Fixes
+
+* **slim-spire:** refresh the stale chainguard and registrar image pins ([#24](https://github.com/agntcy/slim-staging/issues/24)) ([bfb59f0](https://github.com/agntcy/slim-staging/commit/bfb59f0573d0bfa6065edfaf79403e3fe301e597))
+
 ## [2.0.0](https://github.com/agntcy/slim/compare/helm-slim-spire-v1.4.0...helm-slim-spire-v2.0.0) (2026-08-07)
 
 
