@@ -39,10 +39,10 @@ config:
   #       insecure: false
   #       source:
   #         type: spire
-  #         socket_path: "unix:///run/spire/agent-sockets/api.sock"
+  #         socket_path: "unix:///spiffe-workload-api/spire-agent.sock"
   #     auth:
   #       type: spire
-  #       socket_path: "unix:///run/spire/agent-sockets/api.sock"
+  #       socket_path: "unix:///spiffe-workload-api/spire-agent.sock"
 
   database:
     type: sqlite
@@ -62,6 +62,24 @@ config:
 
 spire:
   enabled: false
+  # Must match the className the SPIRE controller manager watches. See the
+  # note in the slim chart: a mismatch leaves the ClusterSPIFFEID
+  # unreconciled and the workload without an SVID, with no error.
+  className: spire-spire
+  # Inject the agent's Workload API socket with the SPIFFE CSI driver instead
+  # of a hostPath mount. The driver registers the workload synchronously, so
+  # the socket is present before the container starts; a hostPath mount can
+  # race pod startup. This is how the dir deployment does it. Requires the
+  # spiffe-csi-driver to be installed, which the slim-spire chart provides.
+  useCSIDriver: true
+  csiDriver: csi.spiffe.io
+  # Where the socket directory is mounted in the container. The socket inside
+  # is spire-agent.sock, so config should reference
+  #   unix://<socketDir>/spire-agent.sock
+  socketDir: /spiffe-workload-api
+  # Node path to the agent's socket directory. Only used when useCSIDriver
+  # is false.
+  hostSocketPath: /run/spire/agent-sockets
   # Slim Controller SVIDs will be federated with these trust domains
   trustedDomains: []
     # - cluster-a.example.org

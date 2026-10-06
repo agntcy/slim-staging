@@ -74,8 +74,8 @@ spec:
               subPath: config.yaml                          
 {{- if eq .Values.spire.enabled true }}
             - name: spire-agent-socket
-              mountPath: /run/spire/agent-sockets
-              readOnly: false
+              mountPath: {{ .Values.spire.socketDir }}
+              readOnly: true
 {{- end}}
 {{- if .Values.persistence.enabled }}
             - name: db-storage
@@ -87,9 +87,15 @@ spec:
       volumes:
 {{- if eq .Values.spire.enabled true }}
         - name: spire-agent-socket
+{{- if .Values.spire.useCSIDriver }}
+          csi:
+            driver: {{ .Values.spire.csiDriver }}
+            readOnly: true
+{{- else }}
           hostPath:
-            path: /run/spire/agent-sockets
+            path: {{ .Values.spire.hostSocketPath }}
             type: Directory
+{{- end }}
 {{- end}}      
         - name: config-volume
           configMap:
