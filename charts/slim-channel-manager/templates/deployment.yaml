@@ -67,6 +67,11 @@ spec:
             - name: slim-store
               mountPath: {{ .Values.persistence.path.value }}
             {{- end }}
+            {{- if .Values.spire.enabled }}
+            - name: spire-agent-socket
+              mountPath: {{ .Values.spire.socketDir }}
+              readOnly: true
+            {{- end }}
             {{- with .Values.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
@@ -78,6 +83,12 @@ spec:
         - name: slim-store
           persistentVolumeClaim:
             claimName: {{ .Values.persistence.existingClaim | default (include "channel-manager.fullname" .) }}
+        {{- end }}
+        {{- if .Values.spire.enabled }}
+        - name: spire-agent-socket
+          hostPath:
+            path: {{ .Values.spire.hostSocketPath }}
+            type: Directory
         {{- end }}
         {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}

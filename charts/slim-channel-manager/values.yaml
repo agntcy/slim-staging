@@ -200,6 +200,32 @@ persistence:
   # Provide an existing PVC name to skip PVC creation
   existingClaim: ""
 
+# SPIRE workload identity. When enabled the chart mounts the SPIRE agent's
+# Workload API socket and registers a ClusterSPIFFEID for this workload, so
+# config.channel-manager.auth can be set to:
+#
+#   auth:
+#     type: spire
+#     socket_path: "unix:/tmp/spire-agent/public/api.sock"
+#     jwt_audiences: ["slim"]
+#
+# which replaces the shared_secret credential with a SPIFFE identity. The
+# socket mount and the registration are all this chart provides; the auth
+# block itself stays in config, as it does for a shared secret.
+spire:
+  enabled: false
+  # Matches the className of the SPIRE deployment issuing the identities.
+  className: spire-spire
+  # Where the agent's socket is mounted in the container. Keep this in step
+  # with socket_path in the auth block above.
+  socketDir: /tmp/spire-agent/public/
+  # Where the agent exposes its socket on the node.
+  hostSocketPath: /run/spire/agent-sockets
+  # SVIDs will be federated with these trust domains
+  trustedDomains: []
+    # - cluster-a.example.org
+    # - cluster-b.example.org
+
 nodeSelector: {}
 
 tolerations: []
