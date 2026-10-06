@@ -7,11 +7,19 @@
     ":dependencyDashboard"
   ],
   "configMigration": true,
-  "dependencyDashboardLabels": ["dependencies"],
+  "dependencyDashboardLabels": [
+    "dependencies"
+  ],
   "dependencyDashboardOSVVulnerabilitySummary": "all",
   "enabled": true,
-  "enabledManagers": ["github-actions", "helm-values"],
-  "labels": ["dependencies"],
+  "enabledManagers": [
+    "github-actions",
+    "helm-values",
+    "custom.regex"
+  ],
+  "labels": [
+    "dependencies"
+  ],
   "minimumReleaseAge": "7 days",
   "osvVulnerabilityAlerts": true,
   "prConcurrentLimit": 10,
@@ -23,8 +31,12 @@
   "timezone": "Etc/UTC",
   "packageRules": [
     {
-      "description": ["Ignore major dependency updates."],
-      "matchUpdateTypes": ["major"],
+      "description": [
+        "Ignore major dependency updates."
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
       "enabled": false
     },
     {
@@ -34,17 +46,42 @@
       ],
       "groupName": "SPIRE images",
       "groupSlug": "spire-images",
-      "matchManagers": ["helm-values"],
-      "matchFileNames": ["charts/slim-spire/**"],
-      "addLabels": ["spire"]
+      "matchManagers": [
+        "helm-values"
+      ],
+      "matchFileNames": [
+        "charts/slim-spire/**"
+      ],
+      "addLabels": [
+        "spire"
+      ]
     },
     {
       "description": [
-        "The agntcy images are released from agntcy/slim and selected by each chart's",
-        "appVersion, not by a tag pinned in values.yaml, so leave them to the release process."
+        "Image tags in values.yaml are selected by each chart's appVersion, not pinned here,",
+        "so leave them to the release process. Scoped to helm-values so it does not also",
+        "disable the chart-version updates from the custom managers."
       ],
-      "matchPackageNames": ["ghcr.io/agntcy/**"],
-      "enabled": false
+      "matchPackageNames": [
+        "ghcr.io/agntcy/**"
+      ],
+      "enabled": false,
+      "matchManagers": [
+        "helm-values"
+      ]
+    },
+    {
+      "description": [
+        "Group the deployed chart version bumps into a single PR."
+      ],
+      "groupName": "SLIM charts",
+      "groupSlug": "slim-charts",
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "addLabels": [
+        "charts"
+      ]
     },
     {
       "description": [
@@ -58,8 +95,42 @@
   ],
   "vulnerabilityAlerts": {
     "enabled": true,
-    "labels": ["security"],
+    "labels": [
+      "security"
+    ],
     "minimumReleaseAge": null,
-    "schedule": ["at any time"]
-  }
+    "schedule": [
+      "at any time"
+    ]
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": [
+        "Bump the OCI Helm chart versions the Argo applications deploy.",
+        "config.json sits directly under <app>/dev/, unlike agntcy-deployment where it is one level deeper."
+      ],
+      "managerFilePatterns": [
+        "/(^|/)applications/.+/config\\.json$/"
+      ],
+      "matchStrings": [
+        "\"chart_repo\"\\s*:\\s*\"ghcr\\.io\"\\s*,\\s*\"chart_name\"\\s*:\\s*\"(?<depName>[^\"]+)\"\\s*,\\s*\"chart_version\"\\s*:\\s*\"(?<currentValue>[^\"]+)\""
+      ],
+      "datasourceTemplate": "docker",
+      "registryUrlTemplate": "https://ghcr.io"
+    },
+    {
+      "customType": "regex",
+      "description": [
+        "Same, for charts served from an HTTP(S) Helm repository."
+      ],
+      "managerFilePatterns": [
+        "/(^|/)applications/.+/config\\.json$/"
+      ],
+      "matchStrings": [
+        "\"chart_repo\"\\s*:\\s*\"(?<registryUrl>https?://[^\"]+)\"\\s*,\\s*\"chart_name\"\\s*:\\s*\"(?<depName>[^\"]+)\"\\s*,\\s*\"chart_version\"\\s*:\\s*\"(?<currentValue>[^\"]+)\""
+      ],
+      "datasourceTemplate": "helm"
+    }
+  ]
 }
