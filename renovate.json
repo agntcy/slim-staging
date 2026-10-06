@@ -1,0 +1,66 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "helpers:pinGitHubActionDigestsToSemver",
+    ":semanticCommitTypeAll(chore)",
+    ":dependencyDashboard"
+  ],
+  "configMigration": true,
+  "dependencyDashboardLabels": ["dependencies"],
+  "dependencyDashboardOSVVulnerabilitySummary": "all",
+  "enabled": true,
+  "enabledManagers": ["github-actions", "helm-values"],
+  "labels": ["dependencies"],
+  "minimumReleaseAge": "7 days",
+  "osvVulnerabilityAlerts": true,
+  "prConcurrentLimit": 10,
+  "prHourlyLimit": 5,
+  "printConfig": false,
+  "rebaseWhen": "behind-base-branch",
+  "reviewersFromCodeOwners": true,
+  "schedule": ["before 8am on Monday"],
+  "semanticCommits": "enabled",
+  "timezone": "Etc/UTC",
+  "packageRules": [
+    {
+      "description": ["Ignore major dependency updates."],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    },
+    {
+      "description": [
+        "Group the third-party images pinned by the vendored SPIRE chart into a single PR.",
+        "These pins are the source of the repository's Trivy code-scanning alerts."
+      ],
+      "groupName": "SPIRE images",
+      "groupSlug": "spire-images",
+      "matchManagers": ["helm-values"],
+      "matchFileNames": ["charts/slim-spire/**"],
+      "addLabels": ["spire"]
+    },
+    {
+      "description": [
+        "The agntcy images are released from agntcy/slim and selected by each chart's",
+        "appVersion, not by a tag pinned in values.yaml, so leave them to the release process."
+      ],
+      "matchPackageNames": ["ghcr.io/agntcy/**"],
+      "enabled": false
+    },
+    {
+      "description": [
+        "Always allow vulnerability/security fixes, even when another rule disables them."
+      ],
+      "matchJsonata": [
+        "$exists(vulnerabilityFixVersion) or isVulnerabilityAlert = true"
+      ],
+      "enabled": true
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": ["security"],
+    "minimumReleaseAge": null,
+    "schedule": ["at any time"]
+  }
+}
