@@ -605,7 +605,7 @@ controllerManager:
     registry: ghcr.io
     repository: spiffe/spire-controller-manager
     pullPolicy: IfNotPresent
-    tag: "0.6.3"
+    tag: "0.7.0"
 
   ## @param controllerManager.resources [object] Resource requests and limits for controller manager
   resources: {}
@@ -1024,7 +1024,7 @@ nodeAttestor:
       registry: ghcr.io
       repository: spiffe/spire-tpm-plugin-tpm-attestor-server
       pullPolicy: IfNotPresent
-      tag: "v1.9.0"
+      tag: "v1.11.3"
     ## @param nodeAttestor.tpmDirect.checksum The sha256 checksum of the plugin binary
     checksum: 46d0caad8c25a027dd11c93e18b58a8bc6fbd9f1fe2e36fa2a0dd440986de4dc
     ## @param nodeAttestor.tpmDirect.pluginPath The filename in the container of the plugin
