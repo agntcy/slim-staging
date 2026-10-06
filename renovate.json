@@ -84,6 +84,27 @@
     },
     {
       "description": [
+        "Keep the controller manager at the 0.7.x upstream spire 0.30.2 pairs with.",
+        "0.8.0 exists but the chart has not adopted it, and this chart is a fork of",
+        "upstream 0.28.3, so running ahead risks a CRD mismatch. Raise with the chart."
+      ],
+      "matchPackageNames": [
+        "ghcr.io/spiffe/spire-controller-manager"
+      ],
+      "allowedVersions": "<0.8.0"
+    },
+    {
+      "description": [
+        "Keep the node driver registrar at the v2.15.x upstream spire 0.30.2 pairs with.",
+        "v2.18.0 exists but the chart has not adopted it. Raise with the chart."
+      ],
+      "matchPackageNames": [
+        "registry.k8s.io/sig-storage/csi-node-driver-registrar"
+      ],
+      "allowedVersions": "<2.16.0"
+    },
+    {
+      "description": [
         "Always allow vulnerability/security fixes, even when another rule disables them."
       ],
       "matchJsonata": [
