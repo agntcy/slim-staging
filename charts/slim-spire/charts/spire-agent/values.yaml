@@ -195,7 +195,7 @@ nodeAttestor:
         registry: ghcr.io
         repository: spiffe/spire-tpm-plugin-tpm-attestor-agent
         pullPolicy: IfNotPresent
-        tag: "v1.9.0"
+        tag: "v1.11.3"
       ## @param nodeAttestor.tpmDirect.plugin.checksum The sha256 checksum of the plugin binary
       checksum: 22f67063f1699330e70cdedc9b923e517688f5ae71085a26bd9b83b3060ee86e
       ## @param nodeAttestor.tpmDirect.plugin.path The filename in the container of the plugin
@@ -212,7 +212,7 @@ nodeAttestor:
         registry: ghcr.io
         repository: spiffe/spire-tpm-plugin-get-tpm-pubhash
         pullPolicy: IfNotPresent
-        tag: "v1.9.0"
+        tag: "v1.11.3"
   awsIID:
     ## @param nodeAttestor.awsIID.enabled Enable the aws_iid Node Attestor
     enabled: false
@@ -329,7 +329,7 @@ hostCert:
     registry: cgr.dev
     repository: chainguard/min-toolkit-debug
     pullPolicy: IfNotPresent
-    tag: latest@sha256:601ce1eefc504aecb6b5804628e086ad05df89dd6955358c577541a9e4b59424
+    tag: latest@sha256:08b7f6c1f4df2492faa179933a8633783978fc2d2c6c661a5554697c7e8192e1
 
 ## @param priorityClassName Priority class assigned to daemonset pods. Can be auto set with global.recommendations.priorityClassName.
 priorityClassName: ""
