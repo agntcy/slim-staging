@@ -50,7 +50,7 @@ config:
     # For SPIRE authentication:
     # auth:
     #   type: spire
-    #   socket_path: "unix:/tmp/spire-agent/public/api.sock"
+    #   socket_path: "unix:///spiffe-workload-api/spire-agent.sock"
     #   target_spiffe_id: ""
     #   jwt_audiences: ["slim"]
     #   trust_domains: []
@@ -206,7 +206,7 @@ persistence:
 #
 #   auth:
 #     type: spire
-#     socket_path: "unix:/tmp/spire-agent/public/api.sock"
+#     socket_path: "unix:///spiffe-workload-api/spire-agent.sock"
 #     jwt_audiences: ["slim"]
 #
 # which replaces the shared_secret credential with a SPIFFE identity. The
@@ -216,10 +216,19 @@ spire:
   enabled: false
   # Matches the className of the SPIRE deployment issuing the identities.
   className: spire-spire
-  # Where the agent's socket is mounted in the container. Keep this in step
-  # with socket_path in the auth block above.
-  socketDir: /tmp/spire-agent/public/
-  # Where the agent exposes its socket on the node.
+  # Inject the agent's Workload API socket with the SPIFFE CSI driver instead
+  # of a hostPath mount. The driver registers the workload synchronously, so
+  # the socket is present before the container starts; a hostPath mount can
+  # race pod startup. This is how the dir deployment does it. Requires the
+  # spiffe-csi-driver to be installed, which the slim-spire chart provides.
+  useCSIDriver: true
+  csiDriver: csi.spiffe.io
+  # Where the socket directory is mounted in the container. The socket inside
+  # is spire-agent.sock, so config should reference
+  #   unix://<socketDir>/spire-agent.sock
+  socketDir: /spiffe-workload-api
+  # Node path to the agent's socket directory. Only used when useCSIDriver
+  # is false.
   hostSocketPath: /run/spire/agent-sockets
   # SVIDs will be federated with these trust domains
   trustedDomains: []
