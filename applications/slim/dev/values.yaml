@@ -1,2 +1,9 @@
 # Dev overrides on top of the chart defaults.
-# Ref: https://github.com/agntcy/slim/blob/main/charts/slim/values.yaml
+# Ref: https://github.com/agntcy/slim-staging/blob/main/charts/slim/values.yaml
+
+# Workload identity from the slim-spire stack deployed alongside this app.
+# className must match spire-server.controllerManager.className in
+# applications/slim-spire/dev/values.yaml.
+spire:
+  enabled: true
+  className: slim-spire
