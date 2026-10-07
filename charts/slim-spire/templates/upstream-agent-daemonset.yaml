@@ -48,8 +48,9 @@ spec:
       serviceAccountName: {{ $upstreamAgent.serviceAccount.name }}
       initContainers:
         - name: ensure-alternate-names
-          image: cgr.dev/chainguard/bash:latest@sha256:7cb09f5687ec24056954ec10a0bcbb3ad4e8f6ffe7216f20bee680adfc5f02cd
-          imagePullPolicy: IfNotPresent
+{{- $alt := $upstreamAgent.socketAlternate.image }}
+          image: {{ $alt.registry }}/{{ $alt.repository }}:{{ $alt.tag }}
+          imagePullPolicy: {{ $alt.pullPolicy }}
           command: ["bash", "-xc"]
           args:
             - |
