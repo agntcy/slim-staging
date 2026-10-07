@@ -86,9 +86,15 @@ spec:
         {{- end }}
         {{- if .Values.spire.enabled }}
         - name: spire-agent-socket
+{{- if .Values.spire.useCSIDriver }}
+          csi:
+            driver: {{ .Values.spire.csiDriver }}
+            readOnly: true
+{{- else }}
           hostPath:
             path: {{ .Values.spire.hostSocketPath }}
             type: Directory
+{{- end }}
         {{- end }}
         {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}

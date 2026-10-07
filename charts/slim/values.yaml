@@ -57,7 +57,7 @@ slim:
                 # Uncomment below to connect to control plane with MTLS by Spire
                 # source:
                 #   type: spire
-                #   socket_path: unix:///tmp/spire-agent/public/spire-agent.sock
+                #   socket_path: unix:///spiffe-workload-api/spire-agent.sock
               # Required in case of multi-cluster setup or when SLIM nodes are behind a NAT or Load Balancer.
               # metadata:
               #   # IP or DNS resolvable hostname that other SLIM nodes in the network (cluster)
@@ -179,6 +179,20 @@ spire:
   # created under a different name is simply never reconciled and the
   # workload silently never receives an SVID.
   className: spire-spire
+  # Inject the agent's Workload API socket with the SPIFFE CSI driver instead
+  # of a hostPath mount. The driver registers the workload synchronously, so
+  # the socket is present before the container starts; a hostPath mount can
+  # race pod startup. This is how the dir deployment does it. Requires the
+  # spiffe-csi-driver to be installed, which the slim-spire chart provides.
+  useCSIDriver: true
+  csiDriver: csi.spiffe.io
+  # Where the socket directory is mounted in the container. The socket inside
+  # is spire-agent.sock, so config should reference
+  #   unix://<socketDir>/spire-agent.sock
+  socketDir: /spiffe-workload-api
+  # Node path to the agent's socket directory. Only used when useCSIDriver
+  # is false.
+  hostSocketPath: /run/spire/agent-sockets
   helperImage:
     repository: ghcr.io/spiffe/spiffe-helper
     # This sets the pull policy for images.
