@@ -1,6 +1,13 @@
 # Changelog
 
 
+## [2.0.3](https://github.com/agntcy/slim-staging/compare/helm-slim-spire-v2.0.2...helm-slim-spire-v2.0.3) (2026-10-07)
+
+
+### Bug Fixes
+
+* **slim-spire:** move the upstream agent's init image into values ([#53](https://github.com/agntcy/slim-staging/issues/53)) ([10f4cd5](https://github.com/agntcy/slim-staging/commit/10f4cd5b829664d29ca05a7a2329d3e55604ea97))
+
 ## [2.0.2](https://github.com/agntcy/slim-staging/compare/helm-slim-spire-v2.0.1...helm-slim-spire-v2.0.2) (2026-10-06)
 
 
