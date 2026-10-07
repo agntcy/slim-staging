@@ -64,6 +64,18 @@ upstream-spiffe-csi-driver:
 ## @section Upstream SPIRE agent parameters
 upstream-spire-agent:
   nameOverride: agent-upstream-placeholder
+  # Init container that fixes up the agent socket's alternate names. Declared
+  # here rather than written into templates/upstream-agent-daemonset.yaml so
+  # that renovate's helm-values manager can see it: a digest hardcoded in a
+  # template is invisible to that manager and silently goes stale, which is
+  # what happened to this one while the same image in the spire-agent subchart
+  # kept being refreshed.
+  socketAlternate:
+    image:
+      registry: cgr.dev
+      repository: chainguard/bash
+      pullPolicy: IfNotPresent
+      tag: latest@sha256:3a5a750e5d21d5de8b7341167cae5104da0004bf10c08844e9486342ad42d0f6
   serviceAccount:
     name: spire-agent-upstream
   server:
