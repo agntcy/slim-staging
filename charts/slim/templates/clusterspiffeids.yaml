@@ -10,7 +10,7 @@ kind: ClusterSPIFFEID
 metadata:
   name: {{ include "slim.fullname" . }}
 spec:
-  className: spire-spire
+  className: {{ .Values.spire.className }}
   podSelector:
     matchExpressions:
     - key: app.kubernetes.io/name

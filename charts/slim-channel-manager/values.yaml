@@ -50,7 +50,7 @@ config:
     # For SPIRE authentication:
     # auth:
     #   type: spire
-    #   socket_path: "unix:/tmp/spire-agent/public/api.sock"
+    #   socket_path: "unix:///tmp/spire-agent/public/spire-agent.sock"
     #   target_spiffe_id: ""
     #   jwt_audiences: ["slim"]
     #   trust_domains: []
@@ -206,7 +206,7 @@ persistence:
 #
 #   auth:
 #     type: spire
-#     socket_path: "unix:/tmp/spire-agent/public/api.sock"
+#     socket_path: "unix:///tmp/spire-agent/public/spire-agent.sock"
 #     jwt_audiences: ["slim"]
 #
 # which replaces the shared_secret credential with a SPIFFE identity. The
