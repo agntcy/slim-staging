@@ -1,6 +1,18 @@
 # Changelog
 
 
+## [2.4.0](https://github.com/agntcy/slim-staging/compare/helm-slim-control-plane-v2.3.0...helm-slim-control-plane-v2.4.0) (2026-10-07)
+
+
+### Features
+
+* **charts:** inject the spire socket with the csi driver ([#52](https://github.com/agntcy/slim-staging/issues/52)) ([e76d686](https://github.com/agntcy/slim-staging/commit/e76d6865a71c22ccf5a66fe6098fb9abd7d2d088))
+
+
+### Bug Fixes
+
+* **charts:** make the spire class name configurable and correct the socket path ([#40](https://github.com/agntcy/slim-staging/issues/40)) ([0411fd4](https://github.com/agntcy/slim-staging/commit/0411fd4981550280b536f909db7908c83585d4d2))
+
 ## [2.3.0](https://github.com/agntcy/slim-staging/compare/helm-slim-control-plane-v2.2.0...helm-slim-control-plane-v2.3.0) (2026-10-06)
 
 
