@@ -39,10 +39,10 @@ config:
   #       insecure: false
   #       source:
   #         type: spire
-  #         socket_path: "unix:///run/spire/agent-sockets/api.sock"
+  #         socket_path: "unix:///tmp/spire-agent/public/spire-agent.sock"
   #     auth:
   #       type: spire
-  #       socket_path: "unix:///run/spire/agent-sockets/api.sock"
+  #       socket_path: "unix:///tmp/spire-agent/public/spire-agent.sock"
 
   database:
     type: sqlite
@@ -62,6 +62,10 @@ config:
 
 spire:
   enabled: false
+  # Must match the className the SPIRE controller manager watches. See the
+  # note in the slim chart: a mismatch leaves the ClusterSPIFFEID
+  # unreconciled and the workload without an SVID, with no error.
+  className: spire-spire
   # Slim Controller SVIDs will be federated with these trust domains
   trustedDomains: []
     # - cluster-a.example.org
