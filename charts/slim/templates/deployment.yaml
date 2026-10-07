@@ -103,7 +103,7 @@ spec:
               subPath: config.yaml
 {{- if eq .Values.spire.enabled true }}
             - name: spire-agent-socket
-              mountPath: /tmp/spire-agent/public/
+              mountPath: {{ .Values.spire.socketDir }}
               readOnly: true
 {{- end }}
 {{- with .Values.slim.extraVolumeMounts }}
@@ -118,9 +118,15 @@ spec:
         {{- end }}
 {{- if eq .Values.spire.enabled true }}
         - name: spire-agent-socket
+{{- if .Values.spire.useCSIDriver }}
+          csi:
+            driver: {{ .Values.spire.csiDriver }}
+            readOnly: true
+{{- else }}
           hostPath:
-            path: /run/spire/agent-sockets
+            path: {{ .Values.spire.hostSocketPath }}
             type: Directory
+{{- end }}
 {{- end}}
       {{- with .Values.nodeSelector }}
       nodeSelector:
