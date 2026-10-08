@@ -1,2 +1,20 @@
 # Dev overrides on top of the chart defaults.
-# Ref: https://github.com/agntcy/slim/blob/main/charts/slim-spire/values.yaml
+# Ref: https://github.com/agntcy/slim-staging/blob/main/charts/slim-spire/values.yaml
+
+global:
+  spire:
+    clusterName: local-dev
+    # The chart ships example.org as a placeholder. A reference deployment
+    # should carry a real one, because it appears in every SPIFFE ID copied
+    # out of here: spiffe://slim-staging.agntcy.org/ns/<ns>/sa/<sa>
+    trustDomain: slim-staging.agntcy.org
+
+spire-server:
+  controllerManager:
+    # Pinned rather than left to derive. Without this the controller class
+    # becomes <namespace>-<release>, which here is
+    # slim-dev-spire-slim-spire-slim-dev-argoapp, and every ClusterSPIFFEID
+    # would have to spell that out. The SLIM charts set spire.className to
+    # this same value; a mismatch is never reported -- the ClusterSPIFFEID is
+    # simply not reconciled and no SVID is ever issued.
+    className: slim-spire
