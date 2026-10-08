@@ -1,2 +1,21 @@
 # Dev overrides on top of the chart defaults.
-# Ref: https://github.com/agntcy/slim/blob/main/charts/slim-channel-manager/values.yaml
+# Ref: https://github.com/agntcy/slim-staging/blob/main/charts/slim-channel-manager/values.yaml
+
+# Workload identity from the slim-spire stack deployed alongside this app.
+# className must match spire-server.controllerManager.className in
+# applications/slim-spire/dev/values.yaml.
+spire:
+  enabled: true
+  className: slim-spire
+
+config:
+  channel-manager:
+    # The channel manager is a SLIM application, so unlike the data plane and
+    # control plane it has to present an identity rather than only verify one.
+    # AuthConfig offers shared_secret or spire, so this is what lets the
+    # reference run without a symmetric key in a Secret.
+    auth:
+      type: spire
+      socket_path: unix:///spiffe-workload-api/spire-agent.sock
+      jwt_audiences:
+        - slim
