@@ -84,14 +84,15 @@
     },
     {
       "description": [
-        "Keep the controller manager at the 0.7.x upstream spire 0.30.2 pairs with.",
-        "0.8.0 exists but the chart has not adopted it, and this chart is a fork of",
-        "upstream 0.28.3, so running ahead risks a CRD mismatch. Raise with the chart."
+        "Keep the controller manager at the 0.8.x upstream spire 0.30.3 pairs with.",
+        "Upstream 0.30.2 paired 0.7.0, which is why this was capped below 0.8.0;",
+        "0.30.3 moved to 0.8.0. This chart is a fork of upstream 0.28.3, so stay",
+        "with the version the upstream chart ships and raise this again when it moves."
       ],
       "matchPackageNames": [
         "ghcr.io/spiffe/spire-controller-manager"
       ],
-      "allowedVersions": "<0.8.0"
+      "allowedVersions": "<0.9.0"
     },
     {
       "description": [
