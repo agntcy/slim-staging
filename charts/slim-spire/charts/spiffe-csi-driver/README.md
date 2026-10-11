@@ -1,6 +1,6 @@
 # spiffe-csi-driver
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.2.7](https://img.shields.io/badge/AppVersion-0.2.7-informational?style=flat-square)
+![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.2.13](https://img.shields.io/badge/AppVersion-0.2.13-informational?style=flat-square)
 
 A Helm chart to install the SPIFFE CSI driver.
 
@@ -60,7 +60,7 @@ A Helm chart to install the SPIFFE CSI driver.
 | `nodeDriverRegistrar.image.registry`          | The OCI registry to pull the image from                                                                                                                                  | `registry.k8s.io`                           |
 | `nodeDriverRegistrar.image.repository`        | The repository within the registry                                                                                                                                       | `sig-storage/csi-node-driver-registrar`     |
 | `nodeDriverRegistrar.image.pullPolicy`        | The image pull policy                                                                                                                                                    | `IfNotPresent`                              |
-| `nodeDriverRegistrar.image.tag`               | Overrides the image tag                                                                                                                                                  | `v2.15.0`                                    |
+| `nodeDriverRegistrar.image.tag`               | Overrides the image tag                                                                                                                                                  | `v2.18.0`                                    |
 | `nodeDriverRegistrar.extraEnvVars`            | Extra environment variables to be added to the nodeDriverRegistrar container                                                                                             | `[]`                                        |
 | `agentSocketPath`                             | The unix socket path to the spire-agent                                                                                                                                  | `/run/spire/agent-sockets/spire-agent.sock` |
 | `kubeletPath`                                 | Path to kubelet file                                                                                                                                                     | `/var/lib/kubelet`                          |
