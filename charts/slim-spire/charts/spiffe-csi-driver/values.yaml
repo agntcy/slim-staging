@@ -18,7 +18,8 @@ image:
   registry: ghcr.io
   repository: spiffe/spiffe-csi-driver
   pullPolicy: IfNotPresent
-  tag: ""
+  # Pinned here rather than left to appVersion so renovate tracks it.
+  tag: "0.2.13"
 
 ## @param resources [object] Resource requests and limits for spiffe-csi-driver and its initContainers
 resources: {}
@@ -131,7 +132,7 @@ nodeDriverRegistrar:
     registry: registry.k8s.io
     repository: sig-storage/csi-node-driver-registrar
     pullPolicy: IfNotPresent
-    tag: v2.15.0
+    tag: v2.18.0
   ## @param nodeDriverRegistrar.extraEnvVars [array] Extra environment variables to be added to the nodeDriverRegistrar container
   extraEnvVars: []
 

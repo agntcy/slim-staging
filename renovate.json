@@ -96,16 +96,6 @@
     },
     {
       "description": [
-        "Keep the node driver registrar at the v2.15.x upstream spire 0.30.2 pairs with.",
-        "v2.18.0 exists but the chart has not adopted it. Raise with the chart."
-      ],
-      "matchPackageNames": [
-        "registry.k8s.io/sig-storage/csi-node-driver-registrar"
-      ],
-      "allowedVersions": "<2.16.0"
-    },
-    {
-      "description": [
         "Always allow vulnerability/security fixes, even when another rule disables them."
       ],
       "matchJsonata": [
