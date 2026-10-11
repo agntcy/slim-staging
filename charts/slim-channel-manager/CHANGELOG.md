@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.6.0](https://github.com/agntcy/slim-staging/compare/helm-slim-channel-manager-v2.5.0...helm-slim-channel-manager-v2.6.0) (2026-10-11)
+
+
+### Features
+
+* **charts:** upgrade slim, control-plane and channel-manager to v3.2.1 ([#70](https://github.com/agntcy/slim-staging/issues/70)) ([b8a4260](https://github.com/agntcy/slim-staging/commit/b8a4260d693b3003c16ed1176c4558eecde6bb37))
+
 ## [2.5.0](https://github.com/agntcy/slim-staging/compare/helm-slim-channel-manager-v2.4.0...helm-slim-channel-manager-v2.5.0) (2026-10-09)
 
 
