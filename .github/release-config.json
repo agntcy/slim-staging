@@ -1,6 +1,7 @@
 {
   "bump-patch-for-minor-pre-major": true,
-  "separate-pull-requests": true,
+  "separate-pull-requests": false,
+  "group-pull-request-title-pattern": "chore(${branch}): release charts",
   "sequential-calls": true,
   "include-component-in-tag": true,
   "skip-github-release": false,
