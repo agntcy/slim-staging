@@ -1,6 +1,13 @@
 # Changelog
 
 
+## [2.0.4](https://github.com/agntcy/slim-staging/compare/helm-slim-spire-v2.0.3...helm-slim-spire-v2.0.4) (2026-10-11)
+
+
+### Bug Fixes
+
+* **slim-spire:** move the CSI driver to 0.2.13 and the registrar to v2.18.0 ([#74](https://github.com/agntcy/slim-staging/issues/74)) ([422c826](https://github.com/agntcy/slim-staging/commit/422c82629255fece4413263354d7ffda3a9d277d))
+
 ## [2.0.3](https://github.com/agntcy/slim-staging/compare/helm-slim-spire-v2.0.2...helm-slim-spire-v2.0.3) (2026-10-07)
 
 
