@@ -198,7 +198,7 @@ spire:
     # This sets the pull policy for images.
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "0.12.1"
+    tag: "0.12.2"
   # Slim SVIDs will be federated with these trust domains
   trustedDomains: []
     # - cluster-a.example.org
