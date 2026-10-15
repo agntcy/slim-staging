@@ -1,6 +1,13 @@
 # Changelog
 
 
+## [2.8.1](https://github.com/agntcy/slim-staging/compare/helm-slim-control-plane-v2.8.0...helm-slim-control-plane-v2.8.1) (2026-10-15)
+
+
+### Bug Fixes
+
+* **slim-control-plane:** recreate the pod when its volume is ReadWriteOnce ([#85](https://github.com/agntcy/slim-staging/issues/85)) ([2ba7a1e](https://github.com/agntcy/slim-staging/commit/2ba7a1edff0bd730db4250f546bf6adbf7fbb259))
+
 ## [2.8.0](https://github.com/agntcy/slim-staging/compare/helm-slim-control-plane-v2.7.0...helm-slim-control-plane-v2.8.0) (2026-10-15)
 
 
