@@ -406,6 +406,7 @@ The SQLite database is stored on a `PersistentVolumeClaim` mounted at `/db`.
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
+| `strategy` | Deployment update strategy. Empty means `Recreate` when persistence uses a `ReadWriteOnce` volume, else `RollingUpdate` | `{}` |
 | `persistence.enabled` | Create and mount a PVC for the database | `true` |
 | `persistence.existingClaim` | Use an existing PVC instead of creating a new one | `""` |
 | `persistence.accessModes` | PVC access modes | `[ReadWriteOnce]` |
