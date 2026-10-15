@@ -48,4 +48,6 @@ chart on its next sync; nothing else needs to change.
 ## Checking images for vulnerabilities
 
 `task deps:vuln:images` renders every chart listed in `Taskfile.yml`, extracts
-the container images and scans them with trivy. CI runs the same task.
+the container images and scans them with trivy. It is a local check: nothing
+scans in CI here, because agntcy/slim scans the SLIM images nightly and the
+SPIRE images belong to upstream projects.

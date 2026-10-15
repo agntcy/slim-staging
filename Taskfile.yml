@@ -7,7 +7,13 @@ vars:
   # Only spire. The slim images this repo's charts reference are built in
   # agntcy/slim and scanned there; duplicating them would report the same
   # CVEs against two repositories.
+  # Every chart this repository deploys, for a local check before deploying.
+  # Nothing runs this in CI: agntcy/slim scans the SLIM images it builds, and
+  # the SPIRE images are upstream SPIFFE and Kubernetes projects'.
   VULN_SCAN_CHARTS:
+    - applications/slim/dev
+    - applications/slim-control-plane/dev
+    - applications/slim-channel-manager/dev
     - applications/slim-spire/dev
 
 tasks:
