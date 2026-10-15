@@ -7,8 +7,14 @@ vars:
   # Only spire. The slim images this repo's charts reference are built in
   # agntcy/slim and scanned there; duplicating them would report the same
   # CVEs against two repositories.
+  # The images this repository ships. The SPIRE stack (applications/slim-spire)
+  # is left out: its images are upstream SPIFFE and Kubernetes projects', so
+  # their CVEs are fixed by upgrading to the versions upstream releases, which
+  # renovate already does, not by anything in this repository.
   VULN_SCAN_CHARTS:
-    - applications/slim-spire/dev
+    - applications/slim/dev
+    - applications/slim-control-plane/dev
+    - applications/slim-channel-manager/dev
 
 tasks:
   default:
