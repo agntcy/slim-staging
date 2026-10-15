@@ -13,6 +13,16 @@ spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
+  {{- if .Values.strategy }}
+  strategy:
+    {{- toYaml .Values.strategy | nindent 4 }}
+  {{- else if and .Values.persistence.enabled (has "ReadWriteOnce" .Values.persistence.accessModes) }}
+  # A ReadWriteOnce volume attaches to one node at a time, so a rolling
+  # update's new pod waits for the old one to release it and never starts
+  # unless it lands on that same node.
+  strategy:
+    type: Recreate
+  {{- end }}
   selector:
     matchLabels:
       {{- include "control-plane.selectorLabels" . | nindent 6 }}

@@ -139,6 +139,10 @@ service:
     - port: 50052
       name: south
 
+# Deployment update strategy. Empty means Recreate when persistence uses a
+# ReadWriteOnce volume (the default below), else Kubernetes' RollingUpdate.
+strategy: {}
+
 persistence:
   enabled: true
   existingClaim: ""
