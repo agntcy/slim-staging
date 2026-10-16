@@ -84,6 +84,27 @@
     },
     {
       "description": [
+        "Group the SLIM image bumps (Chart.yaml appVersion) into a single PR.",
+        "Uses a fix prefix, unlike the chore default, so release-please cuts a new chart release."
+      ],
+      "groupName": "SLIM images",
+      "groupSlug": "slim-images",
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "matchFileNames": [
+        "charts/slim/Chart.yaml",
+        "charts/slim-control-plane/Chart.yaml",
+        "charts/slim-channel-manager/Chart.yaml"
+      ],
+      "semanticCommitType": "fix",
+      "semanticCommitScope": "charts",
+      "addLabels": [
+        "charts"
+      ]
+    },
+    {
+      "description": [
         "Keep the controller manager at the 0.8.x upstream spire 0.30.3 pairs with.",
         "Upstream 0.30.2 paired 0.7.0, which is why this was capped below 0.8.0;",
         "0.30.3 moved to 0.8.0. This chart is a fork of upstream 0.28.3, so stay",
@@ -142,6 +163,48 @@
         "\"chart_repo\"\\s*:\\s*\"(?<registryUrl>https?://[^\"]+)\"\\s*,\\s*\"chart_name\"\\s*:\\s*\"(?<depName>[^\"]+)\"\\s*,\\s*\"chart_version\"\\s*:\\s*\"(?<currentValue>[^\"]+)\""
       ],
       "datasourceTemplate": "helm"
+    },
+    {
+      "customType": "regex",
+      "description": [
+        "Bump the slim chart appVersion, which selects the default image tag."
+      ],
+      "managerFilePatterns": [
+        "/^charts/slim/Chart\\.yaml$/"
+      ],
+      "matchStrings": [
+        "^appVersion:\\s*\"(?<currentValue>[^\"]+)\""
+      ],
+      "depNameTemplate": "ghcr.io/agntcy/slim",
+      "datasourceTemplate": "docker"
+    },
+    {
+      "customType": "regex",
+      "description": [
+        "Bump the slim-control-plane chart appVersion, which selects the default image tag."
+      ],
+      "managerFilePatterns": [
+        "/^charts/slim-control-plane/Chart\\.yaml$/"
+      ],
+      "matchStrings": [
+        "^appVersion:\\s*\"(?<currentValue>[^\"]+)\""
+      ],
+      "depNameTemplate": "ghcr.io/agntcy/slim/control-plane",
+      "datasourceTemplate": "docker"
+    },
+    {
+      "customType": "regex",
+      "description": [
+        "Bump the slim-channel-manager chart appVersion, which selects the default image tag."
+      ],
+      "managerFilePatterns": [
+        "/^charts/slim-channel-manager/Chart\\.yaml$/"
+      ],
+      "matchStrings": [
+        "^appVersion:\\s*\"(?<currentValue>[^\"]+)\""
+      ],
+      "depNameTemplate": "ghcr.io/agntcy/slim/channel-manager",
+      "datasourceTemplate": "docker"
     }
   ]
 }
