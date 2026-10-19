@@ -9,6 +9,7 @@ on:
     paths:
       - 'charts/**'
       - '.github/workflows/helm-lint.yaml'
+  merge_group:
   push:
     branches:
       - main
