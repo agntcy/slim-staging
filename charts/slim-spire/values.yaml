@@ -75,7 +75,7 @@ upstream-spire-agent:
       registry: cgr.dev
       repository: chainguard/bash
       pullPolicy: IfNotPresent
-      tag: latest@sha256:3a5a750e5d21d5de8b7341167cae5104da0004bf10c08844e9486342ad42d0f6
+      tag: latest@sha256:f65770e6cc1bd73dfc07d1d32e92e01e604e270d11005e86f4e85ebca7e4dfc4
   serviceAccount:
     name: spire-agent-upstream
   server:
