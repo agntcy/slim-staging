@@ -7,10 +7,10 @@
     ":dependencyDashboard"
   ],
   "configMigration": true,
-  "dependencyDashboardLabels": [
-    "dependencies"
-  ],
-  "dependencyDashboardOSVVulnerabilitySummary": "all",
+  "dependencyDashboard": {
+    "labels": ["dependencies"],
+    "osvVulnerabilitySummary": "all"
+  },
   "enabled": true,
   "enabledManagers": [
     "github-actions",
